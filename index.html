@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="violet" data-system="false">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tyler @// Ultra Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #000000;
+            --card: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
+            --dim: #71717a;
+            --accent: #a78bfa;
+            --accent-glow: rgba(167, 139, 250, 0.15);
+        }
+
+        [data-theme="blue"] { --accent: #3b82f6; --accent-glow: rgba(59, 130, 246, 0.15); }
+        [data-theme="rose"] { --accent: #f43f5e; --accent-glow: rgba(244, 63, 94, 0.15); }
+        [data-theme="emerald"] { --accent: #10b981; --accent-glow: rgba(16, 185, 129, 0.15); }
+        [data-theme="amber"] { --accent: #f59e0b; --accent-glow: rgba(245, 158, 11, 0.15); }
+        [data-theme="crimson"] { --accent: #e11d48; --accent-glow: rgba(225, 29, 72, 0.15); }
+        [data-theme="mono"] { --accent: #ffffff; --accent-glow: rgba(255, 255, 255, 0.1); }
+
+        [data-system="false"] .sys-label { display: none !important; }
+        [data-system="true"] .card { border-style: dashed; }
+        [data-system="true"] .username { font-family: 'JetBrains Mono'; letter-spacing: -4px; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+
+        /* Splash */
+        #splash { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .s-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; opacity: 0; transform: translateY(20px); transition: 0.6s; }
+        .s-sub { font-size: 1rem; color: var(--dim); opacity: 0; transition: 0.6s; }
+        .visible { opacity: 1 !important; transform: translateY(0) !important; }
+
+        /* BG Mesh */
+        .mesh { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), var(--accent-glow), transparent 45%); }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+        header { padding: 80px 0 40px; text-align: center; }
+        .avatar { width: 110px; height: 110px; border-radius: 35px; border: 1px solid var(--border); padding: 5px; background: var(--card); margin-bottom: 1.5rem; }
+        .username { font-size: 4rem; font-weight: 800; text-transform: uppercase; line-height: 1; }
+
+        .controls { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 20px; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--dim); }
+        .switch { position: relative; width: 44px; height: 22px; cursor: pointer; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; inset: 0; background: #111; border-radius: 20px; border: 1px solid var(--border); transition: 0.3s; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 4px; bottom: 3px; background: #fff; transition: 0.3s; border-radius: 50%; }
+        input:checked + .slider { background: var(--accent); }
+        input:checked + .slider:before { transform: translateX(22px); background: #000; }
+
+        /* Sections */
+        .section-tag { margin: 5rem 0 2rem; font-size: 0.7rem; font-weight: 800; color: var(--accent); letter-spacing: 5px; text-transform: uppercase; display: flex; align-items: center; gap: 15px; }
+        .section-tag::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 28px; padding: 1.8rem; backdrop-filter: blur(20px); transition: 0.4s; position: relative; }
+        .card:hover { border-color: var(--accent); transform: translateY(-8px); background: rgba(255,255,255,0.05); }
+        .wide { grid-column: span 2; }
+        .full { grid-column: span 3; }
+
+        .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .card-head i { font-size: 1.6rem; color: var(--accent); }
+        .card-head h3 { font-size: 1.1rem; font-weight: 700; }
+        .card p { font-size: 0.8rem; color: var(--dim); margin-bottom: 1.2rem; }
+
+        /* Forms */
+        input, textarea, select {
+            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border);
+            border-radius: 12px; padding: 12px; color: #fff; font-family: 'JetBrains Mono';
+            font-size: 0.75rem; outline: none; margin-bottom: 8px; transition: 0.2s;
+        }
+        input:focus { border-color: var(--accent); background: rgba(0,0,0,0.7); }
+        .btn {
+            background: var(--accent); color: #000; border: none; padding: 12px;
+            border-radius: 10px; font-weight: 800; cursor: pointer; font-family: 'JetBrains Mono';
+            font-size: 0.7rem; text-transform: uppercase; width: 100%; transition: 0.2s;
+        }
+        .btn:hover { filter: brightness(1.1); transform: scale(1.02); }
+        .btn-red { background: #ef4444; color: #fff; }
+
+        .res-box { background: #050505; padding: 15px; border-radius: 12px; font-family: 'JetBrains Mono'; font-size: 0.7rem; border-left: 3px solid var(--accent); display: none; margin-top: 10px; white-space: pre-wrap; }
+
+        /* Doodle */
+        #doodle-canvas { width: 100%; height: 160px; background: rgba(0,0,0,0.5); border-radius: 15px; border: 1px dashed var(--border); cursor: crosshair; }
+
+        /* Dock */
+        .dock { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(10,10,10,0.85); border: 1px solid var(--border); padding: 10px 20px; border-radius: 25px; display: flex; gap: 15px; backdrop-filter: blur(15px); z-index: 1000; align-items: center; }
+        .dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .dot:hover { transform: scale(1.3); border-color: #fff; }
+
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } .full, .wide { grid-column: span 2; } }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } .full, .wide { grid-column: span 1; } .username { font-size: 2.5rem; } }
+    </style>
+</head>
+<body>
+
+    <!-- Splash Screen -->
+    <div id="splash">
+        <div class="s-box">
+            <div id="istep1">
+                <div class="s-title" id="st1">Hi, I'm Tyler</div>
+                <div class="s-sub" id="ss1">( Xavier )</div>
+                <div class="s-title" style="font-size: 1.1rem; margin-top: 15px;" id="st2">A random person on the internet doing random things.</div>
+            </div>
+            <div id="istep2" style="display: none;">
+                <div class="s-title visible">Welcome to the Private Shell.</div>
+                <div class="s-sub visible">Toolbox Build 4.0.0 Loaded.</div>
+            </div>
+            <button class="btn" id="sbtn" style="display:none; margin-top: 30px; width: 200px;" onclick="closeSplash()">BOOT_SYSTEM</button>
+        </div>
+    </div>
+
+    <div class="mesh" id="mesh"></div>
+
+    <div class="container">
+        <header>
+            <img src="assets/⸜_｡_⸝♡.jpg" class="avatar">
+            <h1 class="username">Tyler</h1>
+            <div class="controls">
+                <span>PORTAL_VIEW</span>
+                <label class="switch"><input type="checkbox" onchange="toggleSys()"><span class="slider"></span></label>
+                <span>SHELL_MODE</span>
+            </div>
+        </header>
+
+        <h2 class="section-tag">Discord Core Shell</h2>
+        <div class="grid">
+            <!-- Identity Lookup -->
+            <div class="card wide">
+                <div class="card-head"><i class='bx bx-id-card'></i><h3>Identity Lookup <span class="sys-label">.sh</span></h3></div>
+                <p>Fetch extensive user metadata from NicheProwler API.</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <input type="text" id="look-id" placeholder="User ID">
+                        <input type="password" id="look-key" placeholder="API Key">
+                        <button class="btn" onclick="lookup()">EXEC_FETCH</button>
+                    </div>
+                    <div id="look-res" class="res-box"></div>
+                </div>
+            </div>
+
+            <!-- Snowflake -->
+            <div class="card">
+                <div class="card-head"><i class='bx bx-time'></i><h3>Snowflake <span class="sys-label">.ts</span></h3></div>
+                <p>Convert Discord ID to exact creation date.</p>
+                <input type="text" id="snow-in" placeholder="Snowflake ID">
+                <button class="btn" onclick="convSnow()">CONVERT</button>
+                <div id="snow-res" class="res-box"></div>
+            </div>
+
+            <!-- Webhook Manager -->
+            <div class="card wide">
+                <div class="card-head"><i class='bx bx-terminal'></i><h3>Webhook Manager <span class="sys-label">.exe</span></h3></div>
+                <p>Fire payloads or nuke webhooks from existence.</p>
+                <input type="text" id="wh-url" placeholder="Webhook URL">
+                <textarea id="wh-msg" placeholder="Content or JSON Payload..." rows="1"></textarea>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="whFire()">SEND_MSG</button>
+                    <button class="btn btn-red" onclick="whNuke()">DELETE_HOOK</button>
+                </div>
+            </div>
+
+            <!-- ANSI Generator -->
+            <div class="card">
+                <div class="card-head"><i class='bx bx-palette'></i><h3>ANSI Gen <span class="sys-label">.gen</span></h3></div>
+                <p>Create colored codeblocks for Discord.</p>
+                <input type="text" id="ansi-in" placeholder="Text to colorize...">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px;">
+                    <button class="btn" style="background:#ef4444" onclick="ansi('31')">R</button>
+                    <button class="btn" style="background:#22c55e" onclick="ansi('32')">G</button>
+                    <button class="btn" style="background:#eab308" onclick="ansi('33')">Y</button>
+                    <button class="btn" style="background:#3b82f6; color:#fff" onclick="ansi('34')">B</button>
+                </div>
+                <button class="btn" style="background:#222; color:#fff" onclick="ansiCopy()">COPY_CODEBLOCK</button>
+            </div>
+        </div>
+
+        <h2 class="section-tag">Developer Assets</h2>
+        <div class="grid">
+            <!-- Codecs -->
+            <div class="card">
+                <div class="card-head"><i class='bx bx-code-alt'></i><h3>Codec Station <span class="sys-label">.bin</span></h3></div>
+                <p>Base64 & Base32 Encoder/Decoder.</p>
+                <textarea id="codec-val" placeholder="Data..." rows="2"></textarea>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                    <button class="btn" onclick="codec('e64')">B64_E</button>
+                    <button class="btn" onclick="codec('d64')">B64_D</button>
+                    <button class="btn" onclick="codec('e32')">B32_E</button>
+                    <button class="btn" onclick="codec('d32')">B32_D</button>
+                </div>
+            </div>
+
+            <!-- Unicode Fonts -->
+            <div class="card">
+                <div class="card-head"><i class='bx bx-font-family'></i><h3>Font Gen <span class="sys-label">.uni</span></h3></div>
+                <p>Transform text into Unicode styles.</p>
+                <input type="text" id="font-in" placeholder="Type here..." oninput="genFonts()">
+                <div id="font-res" style="max-height: 100px; overflow-y: auto; font-family:'JetBrains Mono'; font-size:0.7rem;"></div>
+            </div>
+
+            <!-- JSON Fix -->
+            <div class="card">
+                <div class="card-head"><i class='bx bx-bracket'></i><h3>JSON Fix <span class="sys-label">.pkg</span></h3></div>
+                <p>Beautify and validate raw JSON.</p>
+                <textarea id="json-in" placeholder="Raw JSON..." rows="3"></textarea>
+                <button class="btn" onclick="jsonFix()">FORMAT</button>
+            </div>
+
+            <!-- Token Formatter -->
+            <div class="card">
+                <div class="card-head"><i class='bx bx-key'></i><h3>Token Format <span class="sys-label">.str</span></h3></div>
+                <p>Extract clean tokens from raw strings.</p>
+                <textarea id="token-in" placeholder="Paste text containing tokens..." rows="2"></textarea>
+                <button class="btn" onclick="tokenFix()">CLEAN_TOKENS</button>
+            </div>
+        </div>
+
+        <h2 class="section-tag">Intelligence & Utilities</h2>
+        <div class="grid">
+            <!-- IP Intel -->
+            <div class="card">
+                <div class="card-head"><i class='bx bx-globe'></i><h3>IP Intel <span class="sys-label">.net</span></h3></div>
+                <p>Geo-locate and identify network info.</p>
+                <input type="text" id="ip-in" placeholder="Target IP (Blank for yours)">
+                <button class="btn" onclick="getIP()">SCAN_TARGET</button>
+                <div id="ip-res" class="res-box"></div>
+            </div>
+
+            <!-- Invite Scraper -->
+            <div class="card">
+                <div class="card-head"><i class='bx bx-link-external'></i><h3>Invite Scraper <span class="sys-label">.raw</span></h3></div>
+                <p>Fetch guild info from an invite.</p>
+                <input type="text" id="inv-in" placeholder="discord.gg/...">
+                <button class="btn" onclick="invScrape()">INSPECT</button>
+                <div id="inv-res" class="res-box"></div>
+            </div>
+
+            <!-- MC Tools -->
+            <div class="card">
+                <div class="card-head"><i class='bx bx-cube'></i><h3>MC Station <span class="sys-label">.mcp</span></h3></div>
+                <p>Skin Viewer + Server Pinger.</p>
+                <input type="text" id="mc-name" placeholder="User or play.host.net">
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn" onclick="mcSkin()">SKIN</button>
+                    <button class="btn" onclick="mcPing()">PING</button>
+                </div>
+                <div id="mc-res" class="res-box" style="text-align: center;"></div>
+            </div>
+
+            <!-- Utility Mix -->
+            <div class="card wide">
+                <div class="card-head"><i class='bx bx-slider-alt'></i><h3>Utility Mix <span class="sys-label">.lab</span></h3></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <p>Text Case Morphs:</p>
+                        <input type="text" id="morph-in" placeholder="Text to morph...">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+                            <button class="btn" onclick="morph('up')">UPPER</button>
+                            <button class="btn" onclick="morph('sb')">sPoNgE</button>
+                        </div>
+                    </div>
+                    <div>
+                        <p>Password Generator:</p>
+                        <input type="number" id="pass-len" value="16">
+                        <button class="btn" onclick="genPass()">GENERATE</button>
+                        <div id="pass-res" class="res-box" style="display:block; margin-top:5px;">********</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-tag">Creative & Interaction</h2>
+        <div class="grid">
+            <!-- Doodle -->
+            <div class="card wide">
+                <div class="card-head"><i class='bx bx-edit-alt'></i><h3>Doodle Pad <span class="sys-label">.tmp</span></h3></div>
+                <canvas id="doodle-canvas"></canvas>
+                <button class="btn" style="margin-top: 10px; width: auto;" onclick="clearDoodle()">FLUSH_CANVAS</button>
+            </div>
+
+            <!-- Anon Drop -->
+            <div class="card">
+                <div class="card-head"><i class='bx bx-envelope'></i><h3>Anonymous Drop <span class="sys-label">.log</span></h3></div>
+                <p>Send a secure message to Tyler.</p>
+                <input type="text" id="anon-txt" placeholder="Enter message...">
+                <button class="btn" onclick="sendAnon()">EXEC_SEND</button>
+                <div id="anon-status" style="font-size: 0.6rem; color: var(--accent); margin-top: 5px;"></div>
+            </div>
+        </div>
+
+        <h2 class="section-tag">Directory</h2>
+        <div class="grid" style="margin-bottom: 120px;">
+            <a href="#" class="card" style="display:flex; align-items:center; gap:15px; text-decoration:none; color:inherit;">
+                <img src="https://raw.githubusercontent.com/reallytyler/reallytyler/refs/heads/main/assets/halix.png" style="width:50px; border-radius:15px;">
+                <div><h3>Halix Dev</h3><p style="margin:0">Co-Founder</p></div>
+                <div class="sys-label" style="margin-left:auto; color:var(--accent)">[OWNER]</div>
+            </a>
+            <a href="https://discord.gg/RHtJzuvjDn" target="_blank" class="card" style="display:flex; align-items:center; gap:15px; text-decoration:none; color:inherit;">
+                <img src="https://raw.githubusercontent.com/reallytyler/reallytyler/refs/heads/main/assets/hivecore.png" style="width:50px; border-radius:15px;">
+                <div><h3>HiveCore</h3><p style="margin:0">Discord Admin</p></div>
+                <div class="sys-label" style="margin-left:auto; color:var(--dim)">[STAFF]</div>
+            </a>
+            <a href="#" class="card" style="display:flex; align-items:center; gap:15px; text-decoration:none; color:inherit; opacity:0.5;">
+                <img src="https://raw.githubusercontent.com/reallytyler/reallytyler/refs/heads/main/assets/ashflame.png" style="width:50px; border-radius:15px;">
+                <div><h3>AshFlame</h3><p style="margin:0">Former Member</p></div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Dock -->
+    <div class="dock">
+        <div class="dot" onclick="setTheme('violet')" style="background:#a78bfa"></div>
+        <div class="dot" onclick="setTheme('blue')" style="background:#3b82f6"></div>
+        <div class="dot" onclick="setTheme('rose')" style="background:#f43f5e"></div>
+        <div class="dot" onclick="setTheme('emerald')" style="background:#10b981"></div>
+        <div class="dot" onclick="setTheme('amber')" style="background:#f59e0b"></div>
+        <div class="dot" onclick="setTheme('crimson')" style="background:#e11d48"></div>
+        <div class="dot" onclick="setTheme('mono')" style="background:#fff"></div>
+        <div style="width:1px; height:20px; background:var(--border);"></div>
+        <a href="https://github.com/reallytyler" target="_blank" style="color:#fff; font-size:1.4rem;"><i class='bx bxl-github'></i></a>
+    </div>
+
+    <script>
+        // Splash logic
+        window.onload = () => {
+            if(localStorage.getItem('boot_seq')) document.getElementById('splash').remove();
+            else {
+                setTimeout(() => document.getElementById('st1').classList.add('visible'), 500);
+                setTimeout(() => document.getElementById('ss1').classList.add('visible'), 1200);
+                setTimeout(() => document.getElementById('st2').classList.add('visible'), 2200);
+                setTimeout(() => {
+                    document.getElementById('istep1').style.display = 'none';
+                    document.getElementById('istep2').style.display = 'block';
+                    document.getElementById('sbtn').style.display = 'block';
+                }, 5500);
+            }
+        };
+        function closeSplash() {
+            localStorage.setItem('boot_seq', 'done');
+            document.getElementById('splash').style.opacity = 0;
+            setTimeout(() => document.getElementById('splash').remove(), 600);
+        }
+
+        // System/Theme
+        function toggleSys() { document.documentElement.setAttribute('data-system', event.target.checked); }
+        function setTheme(t) { document.documentElement.setAttribute('data-theme', t); }
+
+        // Logic Helpers
+        async function lookup() {
+            const id = document.getElementById('look-id').value;
+            const key = document.getElementById('look-key').value;
+            const res = document.getElementById('look-res');
+            if(!id || !key) return;
+            res.style.display = 'block'; res.innerText = "FETCHING...";
+            try {
+                const r = await fetch(`https://api.nicheprowler.com/api/v1/user/${id}`, { headers: {'Authorization': key} });
+                const d = await r.json();
+                res.innerText = d.username ? JSON.stringify(d, null, 2) : "USER_NOT_FOUND";
+            } catch(e) { res.innerText = "API_ERROR"; }
+        }
+
+        function convSnow() {
+            const id = document.getElementById('snow-in').value;
+            const res = document.getElementById('snow-res');
+            if(!id) return;
+            res.style.display = 'block';
+            res.innerText = `DATE: ${new Date(Number((BigInt(id) >> 22n) + 1420070400000n)).toUTCString()}`;
+        }
+
+        function whFire() {
+            const url = document.getElementById('wh-url').value;
+            const msg = document.getElementById('wh-msg').value;
+            let body;
+            try { body = JSON.parse(msg); } catch(e) { body = { content: msg }; }
+            fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) }).then(() => alert("FIRED"));
+        }
+
+        function whNuke() {
+            const url = document.getElementById('wh-url').value;
+            if(confirm("Confirm Nuke?")) fetch(url, { method: 'DELETE' }).then(() => alert("HOOK_DESTROYED"));
+        }
+
+        function ansi(c) {
+            const i = document.getElementById('ansi-in');
+            i.value = `\u001b[${c}m${i.value}\u001b[0m`;
+        }
+        function ansiCopy() {
+            navigator.clipboard.writeText("```ansi\n" + document.getElementById('ansi-in').value + "\n```");
+            alert("COPIED");
+        }
+
+        const b32a = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+        function codec(m) {
+            const el = document.getElementById('codec-val');
+            try {
+                if(m === 'e64') el.value = btoa(el.value);
+                if(m === 'd64') el.value = atob(el.value);
+                if(m === 'e32') {
+                    let b = ""; for(let i=0; i<el.value.length; i++) b += el.value.charCodeAt(i).toString(2).padStart(8,'0');
+                    let r = ""; for(let i=0; i<b.length; i+=5) r += b32a[parseInt(b.substring(i,i+5).padEnd(5,'0'), 2)];
+                    el.value = r;
+                }
+            } catch(e) { alert("ERROR"); }
+        }
+
+        function genFonts() {
+            const i = document.getElementById('font-in').value;
+            const res = document.getElementById('font-res');
+            const map = (t, s) => t.replace(/[a-zA-Z]/g, c => String.fromCodePoint(c.charCodeAt(0) + s));
+            res.innerHTML = `<div onclick="navigator.clipboard.writeText(this.innerText)">${map(i, 120171)}</div><div onclick="navigator.clipboard.writeText(this.innerText)">${map(i, 119951)}</div>`;
+        }
+
+        function jsonFix() {
+            const a = document.getElementById('json-in');
+            try { a.value = JSON.stringify(JSON.parse(a.value), null, 4); } catch(e) { alert("INVALID_JSON"); }
+        }
+
+        function tokenFix() {
+            const a = document.getElementById('token-in');
+            const m = a.value.match(/[\w-]{24,28}\.[\w-]{6}\.[\w-]{27,45}/g);
+            a.value = m ? m.join('\n') : "NO_TOKENS_FOUND";
+        }
+
+        async function getIP() {
+            const ip = document.getElementById('ip-in').value;
+            const res = document.getElementById('ip-res');
+            res.style.display = 'block'; res.innerText = "SCANNING...";
+            try {
+                const r = await fetch(`https://ipapi.co/${ip}/json/`);
+                const d = await r.json();
+                res.innerText = `IP: ${d.ip}\nLOC: ${d.city}, ${d.region}\nISP: ${d.org}`;
+            } catch(e) { res.innerText = "SCAN_FAILED"; }
+        }
+
+        async function invScrape() {
+            const code = document.getElementById('inv-in').value.split('/').pop();
+            const res = document.getElementById('inv-res');
+            res.style.display = 'block'; res.innerText = "SCRAPING...";
+            try {
+                const r = await fetch(`https://discord.com/api/v9/invites/${code}?with_counts=true`);
+                const d = await r.json();
+                res.innerText = `NAME: ${d.guild.name}\nMEMBERS: ${d.approximate_member_count}`;
+            } catch(e) { res.innerText = "INVALID_INVITE"; }
+        }
+
+        function mcSkin() {
+            const n = document.getElementById('mc-name').value;
+            document.getElementById('mc-res').style.display = 'block';
+            document.getElementById('mc-res').innerHTML = `<img src="https://minotar.net/helm/${n}/48.png">`;
+        }
+        async function mcPing() {
+            const h = document.getElementById('mc-name').value;
+            const res = document.getElementById('mc-res');
+            res.style.display = 'block'; res.innerText = "PINGING...";
+            try {
+                const r = await fetch(`https://api.mcstatus.io/v2/status/java/${h}`);
+                const d = await r.json();
+                res.innerText = `STATUS: ${d.online ? 'ONLINE' : 'OFFLINE'}\nPLAYERS: ${d.players?.online || 0}`;
+            } catch(e) { res.innerText = "PING_FAILED"; }
+        }
+
+        function morph(t) {
+            const el = document.getElementById('morph-in');
+            if(t === 'up') el.value = el.value.toUpperCase();
+            if(t === 'sb') el.value = el.value.split('').map((c,i)=>i%2?c.toUpperCase():c.toLowerCase()).join('');
+        }
+        function genPass() {
+            const l = document.getElementById('pass-len').value;
+            const c = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+            let r = ""; for(let i=0; i<l; i++) r += c[Math.floor(Math.random()*c.length)];
+            document.getElementById('pass-res').innerText = r;
+        }
+
+        async function sendAnon() {
+            const t = document.getElementById('anon-txt');
+            const s = document.getElementById('anon-status');
+            s.innerText = "SENDING...";
+            const res = await fetch('https://sendamessage.nottylerxd.workers.dev', { method: 'POST', body: JSON.stringify({message: t.value}) });
+            s.innerText = res.ok ? "SENT_SUCCESS" : "FAILED";
+            t.value = "";
+        }
+
+        // Doodle Pad
+        const canvas = document.getElementById('doodle-canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        canvas.width = canvas.offsetWidth; canvas.height = 160;
+        canvas.onmousedown = () => drawing = true;
+        canvas.onmouseup = () => { drawing = false; ctx.beginPath(); };
+        canvas.onmousemove = (e) => {
+            if(!drawing) return;
+            const r = canvas.getBoundingClientRect();
+            ctx.lineWidth = 2; ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+            ctx.lineTo(e.clientX - r.left, e.clientY - r.top); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(e.clientX - r.left, e.clientY - r.top);
+        };
+        function clearDoodle() { ctx.clearRect(0,0,canvas.width, canvas.height); }
+
+        document.addEventListener('mousemove', e => {
+            document.getElementById('mesh').style.setProperty('--x', `${(e.clientX/window.innerWidth)*100}%`);
+            document.getElementById('mesh').style.setProperty('--y', `${(e.clientY/window.innerHeight)*100}%`);
+        });
+    </script>
+</body>
+</html>
